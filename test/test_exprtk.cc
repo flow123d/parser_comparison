@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "exprtk/parser_handler.hh"
+#include "time_profiler.hh"
 
 /**
  * Function tests of base expressions parsing in exprtk:
@@ -57,8 +58,6 @@ void parser_expressions() {
     START_TIMER("test_2048_points");
     pHandler.run_expression_tests(2048);
     END_TIMER("test_2048_points");
-
-    pHandler.profiler_output("exprtk_expressions.yaml");
 }
 
 
@@ -92,22 +91,18 @@ void parser_functions() {
     START_TIMER("test_1024_points");
     pHandler.run_function_tests(1024);
     END_TIMER("test_1024_points");
-
-    pHandler.profiler_output("exprtk_functions.yaml");
 }
 
 
 
 int main()
 {
-    std::cout << "************************\n";
-    std::cout << "**  Test expressions  **\n";
-    std::cout << "************************\n";
+    std::cout << "##################################################################\n";
+    std::cout << "test_of_expressions \n";
     parser_expressions();
-    std::cout << "************************\n";
-    std::cout << "**   Test functions   **\n";
-    std::cout << "************************\n";
+    std::cout << "test_of_functions \n";
     parser_functions();
+    std::cout << "##################################################################\n";
 }
 
 

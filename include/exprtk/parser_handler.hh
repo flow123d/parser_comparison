@@ -18,16 +18,10 @@
 #include <iomanip>
 #include <numeric>
 
-//#include "sys_profiler.hh"
-
 #include "exprtk/exprtk.hpp"
+#include "time_profiler.hh"
 
 using namespace std;
-
-// Empty definitions of macros
-// TODO: Move necessary parts of sys_profiler and relative source files.
-#define START_TIMER(tag)
-#define END_TIMER(tag)
 
 
 class ParserHandler {
@@ -70,12 +64,6 @@ public:
             z_v[i] = (4.95 - (double)(i%10) * 1.1) * 0.2; // values oscillate in <-1; 1>
         }
     }
-
-	void profiler_output(std::string file_name) {
-		//static ofstream os( FilePath(file_name, FilePath::output_file) );
-		//Profiler::instance()->output(MPI_COMM_WORLD, os);
-		//os << endl;
-	}
 
     double cpp_compute_constant() {
     	double sum = 0.0;
@@ -182,70 +170,66 @@ public:
 
     void run_expression_tests(int vec_size) {
         create_data_vectors(vec_size);
-        std::cout << "Tests is running with " << vec_size << " points ..." << std::endl;
 
-        START_TIMER("A_constant_expresions");
+        START_TIMER("constant_expresions");
         this->cpp_compute_constant();
         this->exprtk_parse_vector_fast(constantLine);
-        END_TIMER("A_constant_expresions");
+        END_TIMER("constant_expresions");
 
-        START_TIMER("B_simple_expresions");
+        START_TIMER("simple_expresions");
         this->cpp_compute_simple();
         this->exprtk_parse_vector_fast(simpleLine);
-        END_TIMER("B_simple_expresions");
+        END_TIMER("simple_expresions");
 
-        START_TIMER("C_complex_expresions");
+        START_TIMER("complex_expresions");
         this->cpp_compute_complex();
         this->exprtk_parse_vector_fast(complexLine);
-        END_TIMER("C_complex_expresions");
+        END_TIMER("complex_expresions");
 
-        START_TIMER("D_power_expresions");
+        START_TIMER("power_expresions");
         this->cpp_compute_complex_power();
         this->exprtk_parse_vector_fast(powerLine);
-        END_TIMER("D_power_expresions");
-        std::cout << " ... OK" << std::endl;
+        END_TIMER("power_expresions");
     }
 
     void run_function_tests(int vec_size) {
         create_data_vectors(vec_size);
-        std::cout << "Tests is running with " << vec_size << " points ..." << std::endl;
 
-        START_TIMER("A_plus_function");
+        START_TIMER("plus_function");
         this->exprtk_parse_vector_fast(funcPlus);
-        END_TIMER("A_plus_function");
+        END_TIMER("plus_function");
 
-        START_TIMER("B_power_function");
+        START_TIMER("power_function");
         this->exprtk_parse_vector_fast(funcPower);
-        END_TIMER("B_power_function");
+        END_TIMER("power_function");
 
-        START_TIMER("C_abs_function");
+        START_TIMER("abs_function");
         this->exprtk_parse_vector_fast(funcAbs);
-        END_TIMER("C_abs_function");
+        END_TIMER("abs_function");
 
-        START_TIMER("D_exp_function");
+        START_TIMER("exp_function");
         this->exprtk_parse_vector_fast(funcExp);
-        END_TIMER("D_exp_function");
+        END_TIMER("exp_function");
 
-        START_TIMER("E_log_function");
+        START_TIMER("log_function");
         this->exprtk_parse_vector_fast(funcLog);
-        END_TIMER("E_log_function");
+        END_TIMER("log_function");
 
-        START_TIMER("F_sin_function");
+        START_TIMER("sin_function");
         this->exprtk_parse_vector_fast(funcSin);
-        END_TIMER("F_sin_function");
+        END_TIMER("sin_function");
 
-        START_TIMER("G_asin_function");
+        START_TIMER("asin_function");
         this->exprtk_parse_vector_fast(funcAsin);
-        END_TIMER("G_asin_function");
+        END_TIMER("asin_function");
 
-        START_TIMER("H_ternary_function");
+        START_TIMER("ternary_function");
         this->exprtk_parse_vector_fast(funcTernary);
-        END_TIMER("H_ternary_function");
+        END_TIMER("ternary_function");
 
-        START_TIMER("I_max_function");
+        START_TIMER("max_function");
         this->exprtk_parse_vector_fast(funcMax);
-        END_TIMER("I_max_function");
-        std::cout << " ... OK" << std::endl;
+        END_TIMER("max_function");
     }
 
     // data members
