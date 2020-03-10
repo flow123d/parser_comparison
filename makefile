@@ -61,3 +61,11 @@ test_exprtk:
 	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
 	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
 	build/test_exprtk
+
+test_muparser:
+#	$(MAKE) -C muparser/make all
+	cd muparser && $(MAKE) all
+	rm -f build/test_muparser 2>/dev/null
+	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_muparser test/test_muparser.cc
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser  -o build/test_muparser test/test_muparser.cc
+	build/test_muparser
