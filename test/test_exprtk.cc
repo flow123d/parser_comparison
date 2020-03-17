@@ -25,7 +25,7 @@
  */
 void parser_expressions() {
 	// test of base expressions: constant, simple, complex and complex with power function
-    ParserHandler pHandler;
+    ExprtkParserHandler pHandler;
 
     START_TIMER("test_16_points");
     pHandler.run_expression_tests(16);
@@ -74,7 +74,7 @@ void parser_expressions() {
  *  - max
  */
 void parser_functions() {
-    ParserHandler pHandler;
+    ExprtkParserHandler pHandler;
 
     START_TIMER("test_128_points");
     pHandler.run_function_tests(128);
