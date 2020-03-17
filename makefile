@@ -67,5 +67,14 @@ test_muparser:
 	cd muparser && $(MAKE) all
 	rm -f build/test_muparser 2>/dev/null
 	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_muparser test/test_muparser.cc
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser  -o build/test_muparser test/test_muparser.cc
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser  -o build/test_muparser muparser/obj/mpError.o muparser/obj/mpRPN.o \
+	    muparser/obj/mpICallback.o muparser/obj/mpIValReader.o muparser/obj/mpParserBase.o muparser/obj/mpTokenReader.o muparser/obj/mpVariable.o \
+	    muparser/obj/mpIOprt.o muparser/obj/mpIValue.o muparser/obj/mpParser.o muparser/obj/mpValReader.o muparser/obj/mpFuncStr.o \
+	    muparser/obj/mpFuncCommon.o muparser/obj/mpOprtPostfixCommon.o muparser/obj/mpFuncNonCmplx.o muparser/obj/mpFuncCmplx.o \
+	    muparser/obj/mpIToken.o muparser/obj/mpOprtCmplx.o muparser/obj/mpOprtNonCmplx.o muparser/obj/mpOprtBinCommon.o \
+	    muparser/obj/mpOprtBinAssign.o muparser/obj/mpOprtMatrix.o muparser/obj/mpIPackage.o muparser/obj/mpPackageCommon.o \
+	    muparser/obj/mpPackageStr.o muparser/obj/mpPackageCmplx.o muparser/obj/mpPackageNonCmplx.o muparser/obj/mpPackageMatrix.o \
+	    muparser/obj/mpPackageUnit.o muparser/obj/mpIfThenElse.o muparser/obj/mpValueCache.o muparser/obj/mpValue.o muparser/obj/mpTest.o \
+	    muparser/obj/mpScriptTokens.o muparser/obj/mpFuncMatrix.o muparser/obj/mpOprtIndex.o muparser/obj/mpParserMessageProvider.o \
+	    test/test_muparser.cc 
 	build/test_muparser
