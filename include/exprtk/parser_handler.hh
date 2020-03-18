@@ -22,10 +22,7 @@
 
 class ExprtkParserHandler : public BaseHandler {
 public:
-	ExprtkParserHandler() : BaseHandler() {
-        complexLine = "2*x + y*3 + x*(z-y) + 2*pi*z";
-        powerLine = "2*x + y^3 + x*(z-y) + 2*pi*z";
-    }
+	ExprtkParserHandler() : BaseHandler() {}
 
     void create_data_vectors(int vec_size) {
         nBulkSize = vec_size;

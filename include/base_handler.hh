@@ -23,6 +23,8 @@ public:
 
 	    constantLine = "0.5";
         simpleLine = "x + y + z";
+        complexLine = "2*x + y*3 + x*(z-y) + 2*pi*z";
+        powerLine = "2*x + y^3 + x*(z-y) + 2*pi*z";
 
         funcPlus = "y+0.5";
         funcPower = "y^3";

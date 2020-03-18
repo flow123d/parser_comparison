@@ -29,25 +29,22 @@ using namespace mup;
 class MuParserHandler : public BaseHandler {
 public:
 	MuParserHandler() : BaseHandler() {
-        complexLine = "2 * x + y * 3 + 2 * pi * z";
-        powerLine = "";
-
-        funcPlus = "0.5*y";
+	    funcAsin = "sinh(z)";
 	}
 
     void create_data_vectors(int vec_size) {
         nBulkSize = vec_size;
         nLoops = 5000 * (2048 / vec_size);
 
-        x_v = Value(nBulkSize, 0);
-        y_v = Value(nBulkSize, 0);
-        z_v = Value(nBulkSize, 0);
+        x_v.resize(nBulkSize);
+        y_v.resize(nBulkSize);
+        z_v.resize(nBulkSize);
         r_vect.resize(nBulkSize);
 
         for (int i=0; i<nBulkSize; ++i) {
-            x_v.At(i) = (float_type)i;
-            y_v.At(i) = (float_type)(double)i/100 + 0.01;
-            z_v.At(i) = (float_type)(4.95 - (double)(i%10) * 1.1) * 0.2; // values oscillate in <-1; 1>
+            x_v[i] = i;
+            y_v[i] = (double)i/100 + 0.01;
+            z_v[i] = (4.95 - (double)(i%10) * 1.1) * 0.2; // values oscillate in <-1; 1>
         }
     }
 
@@ -72,7 +69,7 @@ public:
         START_TIMER("cpp_compute");
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
-                r_vect[i] = (double)x_v.At(i).GetFloat() + (double)y_v.At(i).GetFloat() + (double)z_v.At(i).GetFloat();
+                r_vect[i] = x_v[i] + y_v[i] + z_v[i];
             }
         }
         END_TIMER("cpp_compute");
@@ -89,7 +86,24 @@ public:
         START_TIMER("cpp_compute");
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
-                r_vect[i] = 2*(double)x_v.At(i).GetFloat() + (double)y_v.At(i).GetFloat()*3 + + 2*pi*(double)z_v.At(i).GetFloat();
+                r_vect[i] = 2*x_v[i] + y_v[i]*3 + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
+            }
+        }
+        END_TIMER("cpp_compute");
+        for (int i=0; i<nBulkSize; ++i) {
+            sum += r_vect[i];
+        }
+
+    	return sum;
+    }
+
+    double cpp_compute_complex_power() {
+    	double sum = 0.0;
+    	double pi = 3.141592653589793238462643;
+        START_TIMER("cpp_compute");
+        for (int j=0; j<nLoops; ++j) {
+            for (int i=0; i<nBulkSize; ++i) {
+            	r_vect[i] = 2*x_v[i] + pow( y_v[i], 3.0 ) + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
             }
         }
         END_TIMER("cpp_compute");
@@ -104,18 +118,27 @@ public:
         double sum = 0.0;
         ParserX   p;
 
-        p.DefineVar("x", Variable(&x_v));
-        p.DefineVar("y", Variable(&y_v));
-        p.DefineVar("z", Variable(&z_v));
+        Value x(0.0);
+        Value y(0.0);
+        Value z(0.0);
+        Value result(0.0);
+        p.DefineVar("x", Variable(&x));
+        p.DefineVar("y", Variable(&y));
+        p.DefineVar("z", Variable(&z));
         p.SetExpr( _T(expr) );
 
         START_TIMER("parse_vector_fast");
         for (int j=0; j<nLoops; ++j) {
-            Value result = p.Eval();
-
-            sum += (double)result.At(0).GetFloat();
+        	for (int i=0; i<nBulkSize; ++i) {
+                x = x_v[i];
+                y = y_v[i];
+                z = z_v[i];
+                result = p.Eval();
+                r_vect[i] = (double)result.GetFloat();
+            }
         }
         END_TIMER("parse_vector_fast");
+        for (int i=0; i<nBulkSize; ++i) sum += r_vect[i];
 
         return sum;
     }
@@ -137,14 +160,19 @@ public:
         this->cpp_compute_complex();
         this->parse_vector_fast(complexLine);
         END_TIMER("complex_expresions");
+
+        START_TIMER("power_expresions");
+        this->cpp_compute_complex_power();
+        this->parse_vector_fast(powerLine);
+        END_TIMER("power_expresions");
     }
 
     void run_function_tests(int vec_size) {
         create_data_vectors(vec_size);
 
-        START_TIMER("multiplication_function");
+        START_TIMER("plus_function");
         this->parse_vector_fast(funcPlus);
-        END_TIMER("multiplication_function");
+        END_TIMER("plus_function");
 
         START_TIMER("power_function");
         this->parse_vector_fast(funcPower);
@@ -180,9 +208,9 @@ public:
     }
 
     // data members
-    Value x_v;
-    Value y_v;
-    Value z_v;
+    std::vector<double> x_v;
+    std::vector<double> y_v;
+    std::vector<double> z_v;
     std::vector<double> r_vect;
 };
 

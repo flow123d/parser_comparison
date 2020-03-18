@@ -76,7 +76,7 @@ void parser_expressions() {
  *  - ternary operator
  *  - max
  */
-/*void parser_functions() {
+void parser_functions() {
     MuParserHandler pHandler;
 
     START_TIMER("test_128_points");
@@ -94,15 +94,17 @@ void parser_expressions() {
     START_TIMER("test_1024_points");
     pHandler.run_function_tests(1024);
     END_TIMER("test_1024_points");
-}*/
+}
 
 
 
 int main()
 {
     std::cout << "##################################################################\n";
-    std::cout << "test_of_expressions \n";
-    parser_expressions();
+    //std::cout << "test_of_expressions \n";
+    //parser_expressions();
+    std::cout << "test_of_functions \n";
+    parser_functions();
     std::cout << "##################################################################\n";
 }
 
