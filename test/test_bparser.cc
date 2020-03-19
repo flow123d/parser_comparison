@@ -11,10 +11,11 @@
 #include <string>
 #include <iostream>
 
-//#include "muparser_handler.hh"
+#include "bparser_handler.hh"
 #include "time_profiler.hh"
 
 using namespace std;
+using namespace bparser;
 
 
 /**
@@ -26,9 +27,9 @@ using namespace std;
  *
  * All tests are compared with evaluation of same expression specified by raw C++ code.
  */
-/*void parser_expressions() {
+void parser_expressions() {
 	// test of base expressions: constant, simple, complex
-	MuParserHandler pHandler;
+	BParserHandler pHandler;
 
     START_TIMER("test_16_points");
     pHandler.run_expression_tests(16);
@@ -61,7 +62,7 @@ using namespace std;
     START_TIMER("test_2048_points");
     pHandler.run_expression_tests(2048);
     END_TIMER("test_2048_points");
-}*/
+}
 
 
 /**
@@ -76,8 +77,8 @@ using namespace std;
  *  - ternary operator
  *  - max
  */
-/*void parser_functions() {
-    MuParserHandler pHandler;
+void parser_functions() {
+	BParserHandler pHandler;
 
     START_TIMER("test_128_points");
     pHandler.run_function_tests(128);
@@ -94,15 +95,17 @@ using namespace std;
     START_TIMER("test_1024_points");
     pHandler.run_function_tests(1024);
     END_TIMER("test_1024_points");
-}*/
+}
 
 
 
 int main()
 {
     std::cout << "##################################################################\n";
-    //std::cout << "test_of_expressions \n";
-    //parser_expressions();
+    std::cout << "test_of_expressions \n";
+    parser_expressions();
+    std::cout << "test_of_functions \n";
+    parser_functions();
     std::cout << "##################################################################\n";
 }
 

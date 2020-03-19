@@ -48,10 +48,10 @@ clean:
 
 
 	
-#build/grammar.o:
-#	$(COMPILER) $(BASE_OPTIONS) -std=c++11 -I include  -o build/grammar.o -c include/grammar.cc
+build/grammar.o:
+	$(COMPILER) $(BASE_OPTIONS) -std=c++11 -I include  -o build/grammar.o -c bparser/include/grammar.cc
 	
-#grammar: build/grammar.o
+grammar: build/grammar.o
 
 
 ## Proof of concept snippets.
@@ -78,3 +78,8 @@ test_muparser:
 	    muparser/obj/mpScriptTokens.o muparser/obj/mpFuncMatrix.o muparser/obj/mpOprtIndex.o muparser/obj/mpParserMessageProvider.o \
 	    test/test_muparser.cc 
 	build/test_muparser
+
+test_bparser:
+	rm -f build/test_bparser 2>/dev/null
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I bparser  -o build/test_bparser build/grammar.o test/test_bparser.cc
+	build/test_bparser
