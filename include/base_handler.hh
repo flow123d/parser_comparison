@@ -41,7 +41,7 @@ public:
 	    //Profiler::uninitialize();
     }
 
-    virtual double parse_vector_fast(std::string expr) =0;
+    virtual double parse_vector_fast(std::string expr, std::string tag_name) =0;
 
     // data members
     int nLoops;

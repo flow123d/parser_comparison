@@ -27,37 +27,16 @@ void parser_expressions() {
 	// test of base expressions: constant, simple, complex and complex with power function
     ExprtkParserHandler pHandler;
 
-    START_TIMER("test_16_points");
     pHandler.run_expression_tests(16);
-    END_TIMER("test_16_points");
-
-    START_TIMER("test_32_points");
     pHandler.run_expression_tests(32);
-    END_TIMER("test_32_points");
-
-    START_TIMER("test_64_points");
     pHandler.run_expression_tests(64);
-    END_TIMER("test_64_points");
-
-    START_TIMER("test_128_points");
     pHandler.run_expression_tests(128);
-    END_TIMER("test_128_points");
-
-    START_TIMER("test_256_points");
     pHandler.run_expression_tests(256);
-    END_TIMER("test_256_points");
-
-    START_TIMER("test_512_points");
     pHandler.run_expression_tests(512);
-    END_TIMER("test_512_points");
-
-    START_TIMER("test_1024_points");
     pHandler.run_expression_tests(1024);
-    END_TIMER("test_1024_points");
-
-    START_TIMER("test_2048_points");
     pHandler.run_expression_tests(2048);
-    END_TIMER("test_2048_points");
+
+    TimeProfiler::instance().output("exprtk_expr");
 }
 
 
@@ -76,21 +55,12 @@ void parser_expressions() {
 void parser_functions() {
     ExprtkParserHandler pHandler;
 
-    START_TIMER("test_128_points");
     pHandler.run_function_tests(128);
-    END_TIMER("test_128_points");
-
-    START_TIMER("test_256_points");
     pHandler.run_function_tests(256);
-    END_TIMER("test_256_points");
-
-    START_TIMER("test_512_points");
     pHandler.run_function_tests(512);
-    END_TIMER("test_512_points");
-
-    START_TIMER("test_1024_points");
     pHandler.run_function_tests(1024);
-    END_TIMER("test_1024_points");
+
+    TimeProfiler::instance().output("exprtk_func");
 }
 
 
