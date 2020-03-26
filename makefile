@@ -47,15 +47,64 @@ clean:
 	cd build && rm -f *
 
 
-	
+# make .o file of BParser	
 build/grammar.o:
 	$(COMPILER) $(BASE_OPTIONS) -std=c++11 -I include  -o build/grammar.o -c bparser/include/grammar.cc
 	
 grammar: build/grammar.o
 
 
-## Proof of concept snippets.
+# make .o files of MuParser	
+build/muParser.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParser.o -c muparser_/src/muParser.cpp
 
+muparser: build/muParser.o
+
+build/muParserBase.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserBase.o -c muparser_/src/muParserBase.cpp
+
+muparserbase: build/muParserBase.o
+
+build/muParserBytecode.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserBytecode.o -c muparser_/src/muParserBytecode.cpp
+
+muparserbytecode: build/muParserBytecode.o
+
+build/muParserCallback.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserCallback.o -c muparser_/src/muParserCallback.cpp
+
+muparsercallback: build/muParserCallback.o
+
+build/muParserDLL.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserDLL.o -c muparser_/src/muParserDLL.cpp
+
+muparserdll: build/muParserDLL.o
+
+build/muParserError.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserError.o -c muparser_/src/muParserError.cpp
+
+muparsererror: build/muParserError.o
+
+build/muParserInt.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserInt.o -c muparser_/src/muParserInt.cpp
+
+muparserint: build/muParserInt.o
+
+build/muParserTest.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserTest.o -c muparser_/src/muParserTest.cpp
+
+muparsertest: build/muParserTest.o
+
+build/muParserTokenReader.o:
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserTokenReader.o -c muparser_/src/muParserTokenReader.cpp
+
+muparsertokenreader: build/muParserTokenReader.o
+
+# Collective build of .o files
+muparser-all: muparser muparserbase muparserbytecode muparsercallback muparserdll muparsererror muparserint muparsertest muparsertokenreader
+
+
+# make tests	
 test_exprtk:
 	rm -f build/test_exprtk 2>/dev/null
 	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
@@ -63,20 +112,11 @@ test_exprtk:
 	build/test_exprtk
 
 test_muparser:
-#	$(MAKE) -C muparser/make all
-	cd muparser && $(MAKE) all
 	rm -f build/test_muparser 2>/dev/null
 	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_muparser test/test_muparser.cc
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser  -o build/test_muparser muparser/obj/mpError.o muparser/obj/mpRPN.o \
-	    muparser/obj/mpICallback.o muparser/obj/mpIValReader.o muparser/obj/mpParserBase.o muparser/obj/mpTokenReader.o muparser/obj/mpVariable.o \
-	    muparser/obj/mpIOprt.o muparser/obj/mpIValue.o muparser/obj/mpParser.o muparser/obj/mpValReader.o muparser/obj/mpFuncStr.o \
-	    muparser/obj/mpFuncCommon.o muparser/obj/mpOprtPostfixCommon.o muparser/obj/mpFuncNonCmplx.o muparser/obj/mpFuncCmplx.o \
-	    muparser/obj/mpIToken.o muparser/obj/mpOprtCmplx.o muparser/obj/mpOprtNonCmplx.o muparser/obj/mpOprtBinCommon.o \
-	    muparser/obj/mpOprtBinAssign.o muparser/obj/mpOprtMatrix.o muparser/obj/mpIPackage.o muparser/obj/mpPackageCommon.o \
-	    muparser/obj/mpPackageStr.o muparser/obj/mpPackageCmplx.o muparser/obj/mpPackageNonCmplx.o muparser/obj/mpPackageMatrix.o \
-	    muparser/obj/mpPackageUnit.o muparser/obj/mpIfThenElse.o muparser/obj/mpValueCache.o muparser/obj/mpValue.o muparser/obj/mpTest.o \
-	    muparser/obj/mpScriptTokens.o muparser/obj/mpFuncMatrix.o muparser/obj/mpOprtIndex.o muparser/obj/mpParserMessageProvider.o \
-	    test/test_muparser.cc 
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser_/include  -o build/test_muparser build/muParser.o \
+	    build/muParserBase.o build/muParserBytecode.o build/muParserCallback.o build/muParserDLL.o build/muParserError.o \
+	    build/muParserInt.o build/muParserTest.o build/muParserTokenReader.o test/test_muparser.cc 
 	build/test_muparser
 
 test_bparser:

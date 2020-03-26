@@ -14,7 +14,7 @@
 #include "muparser_handler.hh"
 #include "time_profiler.hh"
 
-using namespace mup;
+using namespace mu;
 
 
 /**

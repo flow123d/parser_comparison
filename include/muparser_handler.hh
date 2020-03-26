@@ -19,17 +19,18 @@
 #include <numeric>
 
 #include "base_handler.hh"
-#include "parser/mpParser.h"
-#include "parser/mpDefines.h"
+#include "muParserTest.h"
 
 using namespace std;
-using namespace mup;
+using namespace mu;
 
 
 class MuParserHandler : public BaseHandler {
 public:
 	MuParserHandler() : BaseHandler() {
-	    funcAsin = "sinh(z)";
+	    complexLine = "2*x + y*3 + x*(z-y) + 2*_pi*z";
+	    powerLine = "2*x + y^3 + x*(z-y) + 2*_pi*z";
+	    funcSin = "sin(_pi*y)";
 	}
 
     void create_data_vectors(int vec_size) {
@@ -115,32 +116,22 @@ public:
     }
 
     double parse_vector_fast(std::string expr, std::string tag_name) override {
-        double sum = 0.0;
-        ParserX   p;
+        value_type sum = 0.0;
 
-        Value x(0.0);
-        Value y(0.0);
-        Value z(0.0);
-        Value result(0.0);
-        p.DefineVar("x", Variable(&x));
-        p.DefineVar("y", Variable(&y));
-        p.DefineVar("z", Variable(&z));
-        p.SetExpr( _T(expr) );
+        mu::Parser  parser;
+        parser.DefineVar( _T("x"), &(x_v[0]) );
+        parser.DefineVar( _T("y"), &(y_v[0]) );
+        parser.DefineVar( _T("z"), &(z_v[0]) );
+        parser.SetExpr(expr);
 
         START_TIMER(nBulkSize, tag_name);
         for (int j=0; j<nLoops; ++j) {
-        	for (int i=0; i<nBulkSize; ++i) {
-                x = x_v[i];
-                y = y_v[i];
-                z = z_v[i];
-                result = p.Eval();
-                r_vect[i] = (double)result.GetFloat();
-            }
+            parser.Eval(&(r_vect[0]), nBulkSize);
         }
         END_TIMER(nBulkSize, tag_name);
         for (int i=0; i<nBulkSize; ++i) sum += r_vect[i];
 
-        return sum;
+        return double(sum);
     }
 
     void run_expression_tests(int vec_size) {
@@ -168,7 +159,7 @@ public:
         this->parse_vector_fast(funcExp, "exp");
         this->parse_vector_fast(funcLog, "log");
         this->parse_vector_fast(funcSin, "sin");
-        this->parse_vector_fast(funcAsin, "sinh");
+        this->parse_vector_fast(funcAsin, "asin");
         this->parse_vector_fast(funcTernary, "ternary");
         this->parse_vector_fast(funcMax, "max");
     }

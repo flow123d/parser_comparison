@@ -7,7 +7,11 @@ Comparison of BParser with other state of the art parsers and agains direct C++ 
 - add submodules using the command 'git submodule add'
 - execute 'make' commands defined in makefile:
 ```sh
+# build grammar.o file (bparser)
 make grammar
+# build *.o files (muparser)
+make muparser-all
+# build tests
 make test_exprtk
 make test_muparser
 make test_bparser
