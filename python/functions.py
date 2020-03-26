@@ -79,16 +79,16 @@ ax.set_ylabel("$t$ - time per 10^6 samples")
 ax.set_title("Exprtk test");
 
 
-# muparserx test
-muparser_plus = np.array(df_muparser.iloc[4, 1:5], dtype=float) / m_samples
-muparser_power = np.array(df_muparser.iloc[5, 1:5], dtype=float) / m_samples
+# muparser test
+muparser_plus = np.array(df_muparser.iloc[5, 1:5], dtype=float) / m_samples
+muparser_power = np.array(df_muparser.iloc[6, 1:5], dtype=float) / m_samples
 muparser_abs = np.array(df_muparser.iloc[0, 1:5], dtype=float) / m_samples
-muparser_exp = np.array(df_muparser.iloc[1, 1:5], dtype=float) / m_samples
-muparser_log = np.array(df_muparser.iloc[2, 1:5], dtype=float) / m_samples
-muparser_sin = np.array(df_muparser.iloc[6, 1:5], dtype=float) / m_samples
-muparser_sinh = np.array(df_muparser.iloc[7, 1:5], dtype=float) / m_samples
+muparser_exp = np.array(df_muparser.iloc[2, 1:5], dtype=float) / m_samples
+muparser_log = np.array(df_muparser.iloc[3, 1:5], dtype=float) / m_samples
+muparser_sin = np.array(df_muparser.iloc[7, 1:5], dtype=float) / m_samples
+muparser_asin = np.array(df_muparser.iloc[1, 1:5], dtype=float) / m_samples
 muparser_ternary = np.array(df_muparser.iloc[8, 1:5], dtype=float) / m_samples
-muparser_max = np.array(df_muparser.iloc[3, 1:5], dtype=float) / m_samples
+muparser_max = np.array(df_muparser.iloc[4, 1:5], dtype=float) / m_samples
 
 fig2, ax = plt.subplots(figsize=(12,15), dpi=800)
 
@@ -98,7 +98,7 @@ ax.plot(n_items, muparser_abs, label="abs(z)")
 ax.plot(n_items, muparser_exp, label="exp(y)")
 ax.plot(n_items, muparser_log, label="log(y)")
 ax.plot(n_items, muparser_sin, label="sin(pi*y)")
-ax.plot(n_items, muparser_sinh, label="sinh(z)")
+ax.plot(n_items, muparser_asin, label="asin(z)")
 ax.plot(n_items, muparser_ternary, label="z>0 ? x : y")
 ax.plot(n_items, muparser_max, label="max(x,y,z)")
 ax.legend(loc="upper right"); # upper right corner
