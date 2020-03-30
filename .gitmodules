@@ -1,6 +1,6 @@
 [submodule "bparser"]
 	path = bparser
 	url = https://github.com/flow123d/bparser.git
-[submodule "muparser_"]
-	path = muparser_
-	url = https://github.com/beltoforion/muparser.git
+#[submodule "muparser_"]
+#	path = muparser_
+#	url = https://github.com/beltoforion/muparser.git
