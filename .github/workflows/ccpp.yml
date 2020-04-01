@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Install dependencies
+      run: |
+          sudo apt install libboost-all-dev
     - name: Checkout
       uses: actions/checkout@v2
     - name: Checkout submodules
