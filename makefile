@@ -21,9 +21,19 @@ BUILD_SRC        := $(sort $(wildcard exprtk_*.cpp))
 BUILD_LIST       := $(BUILD_SRC:%.cpp=%)
 
 
-# all: $(BUILD_LIST)
-# 
-# $(BUILD_LIST) : %: %.cpp exprtk.hpp
+.PHONY : all
+all: test_exprtk test_bparser test_muparser plots
+
+
+build:
+	mkdir build 2>/dev/null 
+
+output:
+	mkdir output 2>/dev/null 
+
+	
+	# $(BUILD_LIST) : %: %.cpp exprtk.hpp
+
 # 	$(COMPILER) $(OPTIONS) -o $@ $@.cpp $(LINKER_OPT)
 # 
 # strip_bin :
@@ -44,82 +54,59 @@ BUILD_LIST       := $(BUILD_SRC:%.cpp=%)
 
 	
 clean:
-	cd build && rm -f *
+	cd build && rm -rf *
 
+	
+	
+	
+#############################################
+# BParser
 
 # make .o file of BParser	
-build/grammar.o:
+build/grammar.o: build bparser/include/grammar.cc
 	$(COMPILER) $(BASE_OPTIONS) -std=c++11 -I include  -o build/grammar.o -c bparser/include/grammar.cc
 	
-grammar: build/grammar.o
+build/test_bparser: build build/grammar.o test/test_bparser.cc
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I bparser/include  -o build/test_bparser build/grammar.o test/test_bparser.cc
+	
+test_bparser: build output build/test_bparser
+	build/test_bparser
 
 
-# make .o files of MuParser	
-build/muParser.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParser.o -c muparser_/src/muParser.cpp
-
-muparser: build/muParser.o
-
-build/muParserBase.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserBase.o -c muparser_/src/muParserBase.cpp
-
-muparserbase: build/muParserBase.o
-
-build/muParserBytecode.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserBytecode.o -c muparser_/src/muParserBytecode.cpp
-
-muparserbytecode: build/muParserBytecode.o
-
-build/muParserCallback.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserCallback.o -c muparser_/src/muParserCallback.cpp
-
-muparsercallback: build/muParserCallback.o
-
-build/muParserDLL.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserDLL.o -c muparser_/src/muParserDLL.cpp
-
-muparserdll: build/muParserDLL.o
-
-build/muParserError.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserError.o -c muparser_/src/muParserError.cpp
-
-muparsererror: build/muParserError.o
-
-build/muParserInt.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserInt.o -c muparser_/src/muParserInt.cpp
-
-muparserint: build/muParserInt.o
-
-build/muParserTest.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserTest.o -c muparser_/src/muParserTest.cpp
-
-muparsertest: build/muParserTest.o
-
-build/muParserTokenReader.o:
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I muparser_/include  -o build/muParserTokenReader.o -c muparser_/src/muParserTokenReader.cpp
-
-muparsertokenreader: build/muParserTokenReader.o
-
-# Collective build of .o files
-muparser-all: muparser muparserbase muparserbytecode muparsercallback muparserdll muparsererror muparserint muparsertest muparsertokenreader
 
 
-# make tests	
-test_exprtk:
-	rm -f build/test_exprtk 2>/dev/null
-	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
-	build/test_exprtk
+#############################################
+# muParser
 
-test_muparser:
-	rm -f build/test_muparser 2>/dev/null
+
+muparser/libmuparser.so: build
+	mkdir -p build/muparser 2>/dev/null 
+	cd build/muparser && cmake ../../muparser
+	cd build/muparser && make
+
+build/test_muparser: build muparser/libmuparser.so test/test_muparser.cc
 	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_muparser test/test_muparser.cc
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser_/include  -o build/test_muparser build/muParser.o \
-	    build/muParserBase.o build/muParserBytecode.o build/muParserCallback.o build/muParserDLL.o build/muParserError.o \
-	    build/muParserInt.o build/muParserTest.o build/muParserTokenReader.o test/test_muparser.cc 
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I muparser/include  -o build/test_muparser -Lbuild/muparser -Wl,-rpath=build/muparser test/test_muparser.cc  -lmuparser
+
+test_muparser: build output build/test_muparser
+	#rm -f build/test_muparser 2>/dev/null	
 	build/test_muparser
 
-test_bparser:
-	rm -f build/test_bparser 2>/dev/null
-	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I bparser  -o build/test_bparser build/grammar.o test/test_bparser.cc
-	build/test_bparser
+
+
+#############################################
+#
+
+# make tests	
+build/test_exprtk: build test/test_exprtk.cc
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I exprtk -o build/test_exprtk test/test_exprtk.cc
+
+test_exprtk: build output build/test_exprtk
+	#rm -f build/test_exprtk 2>/dev/null
+	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
+	build/test_exprtk
+
+	
+plots: 
+	
+

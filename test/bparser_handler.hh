@@ -1,15 +1,17 @@
 /*
- * test_parser.hh
+ * bparser_handler.hh
  *
- *  Created on: Mar 02, 2020
+ *  Created on: Mar 19, 2020
  *      Author: David Flanderka
  */
 
-#ifndef EXPRTK_PARSER_HANDLER_HH_
-#define EXPRTK_PARSER_HANDLER_HH_
+#ifndef BPARSER_HANDLER_HH_
+#define BPARSER_HANDLER_HH_
 
 #include <cstdlib>
+#include <cstring>
 #include <cmath>
+#include <string>
 #include <iostream>
 #include <limits>
 #include <ios>
@@ -17,16 +19,26 @@
 #include <numeric>
 
 #include "base_handler.hh"
-#include "exprtk/exprtk.hpp"
+#include "assert.hh"
+#include "parser.hh"
+//#include "test/test_tools.hh"
+
+using namespace std;
+using namespace bparser;
 
 
-class ExprtkParserHandler : public BaseHandler {
+class BParserHandler : public BaseHandler {
 public:
-	ExprtkParserHandler() : BaseHandler() {}
+	BParserHandler() : BaseHandler() {
+	    // rewrite power function to correct Bparser format
+		powerLine = "2*x + pow(y, 3) + x*(z-y) + 2*pi*z";
+        funcPower = "pow(y, 3)";
+	}
 
     void create_data_vectors(int vec_size) {
         nBulkSize = vec_size;
         nLoops = 5000 * (2048 / vec_size);
+        subsets.resize(vec_size/4);
 
         x_v.resize(nBulkSize);
         y_v.resize(nBulkSize);
@@ -37,6 +49,10 @@ public:
             x_v[i] = i;
             y_v[i] = (double)i/100 + 0.01;
             z_v[i] = (4.95 - (double)(i%10) * 1.1) * 0.2; // values oscillate in <-1; 1>
+        }
+
+        for (uint i=0; i<vec_size/4; ++i) {
+            subsets[i] = i;
         }
     }
 
@@ -95,7 +111,7 @@ public:
         START_TIMER(nBulkSize, "power_cpp");
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
-                result_v[i] = 2*x_v[i] + pow( y_v[i], 3.0 ) + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
+            	result_v[i] = 2*x_v[i] + pow( y_v[i], 3.0 ) + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
             }
         }
         END_TIMER(nBulkSize, "power_cpp");
@@ -107,35 +123,20 @@ public:
     }
 
     double parse_vector_fast(std::string expr, std::string tag_name) override {
-        typedef exprtk::symbol_table<double> symbol_table_t;
-        typedef exprtk::expression<double>     expression_t;
-        typedef exprtk::parser<double>             parser_t;
-
-        std::string expression_string = " result_vec := " + expr + " ";
-
-        exprtk::vector_view<double> x_view = exprtk::make_vector_view(x_v,x_v.size());
-        exprtk::vector_view<double> y_view = exprtk::make_vector_view(y_v,y_v.size());
-        exprtk::vector_view<double> z_view = exprtk::make_vector_view(z_v,z_v.size());
-        exprtk::vector_view<double> r_view = exprtk::make_vector_view(result_v,result_v.size());
-
         double sum = 0.0;
 
-        symbol_table_t symbol_table;
-        symbol_table.add_vector("x",x_view);
-        symbol_table.add_vector("y",y_view);
-        symbol_table.add_vector("z",z_view);
-        symbol_table.add_vector("result_vec",r_view);
-        symbol_table.add_constants();
-
-        expression_t expression;
-        expression.register_symbol_table(symbol_table);
-
-        parser_t parser;
-        parser.compile(expression_string,expression);
+        Parser p(nBulkSize);
+        p.parse(expr);
+        p.set_variable("x", {}, &x_v[0]);
+        p.set_variable("y", {}, &y_v[0]);
+        p.set_variable("z", {}, &z_v[0]);
+        p.set_variable("_result_", {}, &result_v[0]);
+        p.compile();
+        p.set_subset(subsets);
 
         START_TIMER(nBulkSize, tag_name);
         for (int j=0; j<nLoops; ++j) {
-            expression.value();
+            p.run();
         }
         END_TIMER(nBulkSize, tag_name);
         for (int i=0; i<nBulkSize; ++i) sum += result_v[i];
@@ -169,16 +170,16 @@ public:
         this->parse_vector_fast(funcLog, "log");
         this->parse_vector_fast(funcSin, "sin");
         this->parse_vector_fast(funcAsin, "asin");
-        this->parse_vector_fast(funcTernary, "ternary");
-        this->parse_vector_fast(funcMax, "max");
+        //this->parse_vector_fast(funcTernary, "ternary");
+        //this->parse_vector_fast(funcMax, "max");
     }
 
-    // Data members
+    // data members
     std::vector<double> x_v;
     std::vector<double> y_v;
     std::vector<double> z_v;
     std::vector<double> result_v;
-
+    std::vector<uint> subsets;
 };
 
-#endif /* EXPRTK_PARSER_HANDLER_HH_ */
+#endif /* BPARSER_HANDLER_HH_ */
