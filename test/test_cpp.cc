@@ -47,13 +47,13 @@ public:
 
     double cpp_compute_constant() {
     	double sum = 0.0;
-        START_TIMER(nBulkSize, "constant_cpp");
+        START_TIMER(this->constantLine_tag, this->nLoops, this->nBulkSize);
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
                 result_v[i] = 0.5;
             }
         }
-        END_TIMER(nBulkSize, "constant_cpp");
+        END_TIMER(this->constantLine_tag, this->nLoops, this->nBulkSize);
         for (int i=0; i<nBulkSize; ++i) {
         	sum += result_v[i];
         }
@@ -63,13 +63,13 @@ public:
 
     double cpp_compute_simple() {
     	double sum = 0.0;
-        START_TIMER(nBulkSize, "simple_cpp");
+        START_TIMER(this->simpleLine_tag, this->nLoops, this->nBulkSize);
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
                 result_v[i] = x_v[i] + y_v[i] + z_v[i];
             }
         }
-        END_TIMER(nBulkSize, "simple_cpp");
+        END_TIMER(this->simpleLine_tag, this->nLoops, this->nBulkSize);
         for (int i=0; i<nBulkSize; ++i) {
             sum += result_v[i];
         }
@@ -80,13 +80,13 @@ public:
     double cpp_compute_complex() {
     	double sum = 0.0;
     	double pi = 3.141592653589793238462643;
-        START_TIMER(nBulkSize, "complex_cpp");
+        START_TIMER(this->complexLine_tag, this->nLoops, this->nBulkSize);
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
                 result_v[i] = 2*x_v[i] + y_v[i]*3 + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
             }
         }
-        END_TIMER(nBulkSize, "complex_cpp");
+        END_TIMER(this->complexLine_tag, this->nLoops, this->nBulkSize);
         for (int i=0; i<nBulkSize; ++i) {
             sum += result_v[i];
         }
@@ -97,13 +97,13 @@ public:
     double cpp_compute_complex_power() {
     	double sum = 0.0;
     	double pi = 3.141592653589793238462643;
-        START_TIMER(nBulkSize, "power_cpp");
+        START_TIMER(this->powerLine_tag, this->nLoops, this->nBulkSize);
         for (int j=0; j<nLoops; ++j) {
             for (int i=0; i<nBulkSize; ++i) {
             	result_v[i] = 2*x_v[i] + pow( y_v[i], 3.0 ) + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
             }
         }
-        END_TIMER(nBulkSize, "power_cpp");
+        END_TIMER(this->powerLine_tag, this->nLoops, this->nBulkSize);
         for (int i=0; i<nBulkSize; ++i) {
             sum += result_v[i];
         }
@@ -123,6 +123,7 @@ public:
  *  - complex with power function
  */
 void parser_run() {
+	TimeProfiler::instance().set_parser("cpp_expr");
 	CppEvaluationHandler pHandler;
 
     // test of base expressions

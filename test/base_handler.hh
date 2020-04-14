@@ -19,12 +19,14 @@ using namespace std;
 class BaseHandler {
 public:
 	BaseHandler() {
-	    //Profiler::initialize();
-
 	    constantLine = "0.5";
         simpleLine = "x + y + z";
         complexLine = "2*x + y*3 + x*(z-y) + 2*pi*z";
         powerLine = "2*x + y^3 + x*(z-y) + 2*pi*z";
+	    constantLine_tag = constantLine;
+        simpleLine_tag = simpleLine;
+        complexLine_tag = complexLine;
+        powerLine_tag = powerLine;
 
         funcPlus = "y+0.5";
         funcPower = "y^3";
@@ -35,13 +37,20 @@ public:
         funcAsin = "asin(z)";
         funcTernary = "z>0 ? x : y";
     	funcMax = "max(x,y,z)";
+        funcPlus_tag = funcPlus;
+        funcPower_tag = funcPower;
+        funcAbs_tag = funcAbs;
+        funcExp_tag = funcExp;
+        funcLog_tag = funcLog;
+        funcSin_tag = funcSin;
+        funcAsin_tag = funcAsin;
+        funcTernary_tag = funcTernary;
+    	funcMax_tag = funcMax;
 
     	switch_off_func = true;
     }
 
-    virtual ~BaseHandler() {
-	    //Profiler::uninitialize();
-    }
+    virtual ~BaseHandler() {}
 
     void create_data_vectors(int vec_size) {
         nBulkSize = vec_size;
@@ -66,25 +75,25 @@ public:
     virtual void run_expression_tests(int vec_size) {
         init(vec_size);
 
-        this->parse_vector_fast(constantLine, "constant_parser");
-        this->parse_vector_fast(simpleLine, "simple_parser");
-        this->parse_vector_fast(complexLine, "complex_parser");
-        this->parse_vector_fast(powerLine, "power_parser");
+        this->parse_vector_fast(constantLine, constantLine_tag);
+        this->parse_vector_fast(simpleLine, simpleLine_tag);
+        this->parse_vector_fast(complexLine, complexLine_tag);
+        this->parse_vector_fast(powerLine, powerLine_tag);
     }
 
     void run_function_tests(int vec_size) {
         init(vec_size);
 
-        this->parse_vector_fast(funcPlus, "plus");
-        this->parse_vector_fast(funcPower, "power");
-        this->parse_vector_fast(funcAbs, "abs");
-        this->parse_vector_fast(funcExp, "exp");
-        this->parse_vector_fast(funcLog, "log");
-        this->parse_vector_fast(funcSin, "sin");
-        this->parse_vector_fast(funcAsin, "asin");
+        this->parse_vector_fast(funcPlus, funcPlus_tag);
+        this->parse_vector_fast(funcPower, funcPower_tag);
+        this->parse_vector_fast(funcAbs, funcAbs_tag);
+        this->parse_vector_fast(funcExp, funcExp_tag);
+        this->parse_vector_fast(funcLog, funcLog_tag);
+        this->parse_vector_fast(funcSin, funcSin_tag);
+        this->parse_vector_fast(funcAsin, funcAsin_tag);
         if (this->switch_off_func) {
-            this->parse_vector_fast(funcTernary, "ternary");
-            this->parse_vector_fast(funcMax, "max");
+            this->parse_vector_fast(funcTernary, funcTernary_tag);
+            this->parse_vector_fast(funcMax, funcMax_tag);
         }
     }
 
@@ -97,11 +106,19 @@ public:
     std::vector<double> z_v;
     std::vector<double> result_v;
 
+    // expressions passed by parsers (can be owerwrite in descendant)
     std::string constantLine;
     std::string simpleLine;
     std::string complexLine;
     std::string powerLine;
 
+    // expressions strings to output (same for all parsers)
+    std::string constantLine_tag;
+    std::string simpleLine_tag;
+    std::string complexLine_tag;
+    std::string powerLine_tag;
+
+    // functions passed by parsers (can be owerwrite in descendant)
     std::string funcPlus;
     std::string funcPower;
     std::string funcAbs;
@@ -111,6 +128,17 @@ public:
     std::string funcAsin;
     std::string funcTernary;
 	std::string funcMax;
+
+    // functions strings to output (same for all parsers)
+    std::string funcPlus_tag;
+    std::string funcPower_tag;
+    std::string funcAbs_tag;
+    std::string funcExp_tag;
+    std::string funcLog_tag;
+    std::string funcSin_tag;
+    std::string funcAsin_tag;
+    std::string funcTernary_tag;
+	std::string funcMax_tag;
 
 	/// Allow switch-off test of ternary operator and max function unsupported in Bparser
 	bool switch_off_func;

@@ -47,11 +47,11 @@ public:
         parser.DefineVar( _T("z"), &(z_v[0]) );
         parser.SetExpr(expr);
 
-        START_TIMER(nBulkSize, tag_name);
+        START_TIMER(tag_name, this->nLoops, this->nBulkSize);
         for (int j=0; j<nLoops; ++j) {
             parser.Eval(&(result_v[j]), nBulkSize);
         }
-        END_TIMER(nBulkSize, tag_name);
+        END_TIMER(tag_name, this->nLoops, this->nBulkSize);
         for (int i=0; i<nBulkSize; ++i) sum += result_v[i];
 
         return double(sum);
@@ -80,6 +80,7 @@ public:
  *  - max
  */
 void parser_run() {
+    TimeProfiler::instance().set_parser("muparser");
 	// test of base expressions: constant, simple, complex
 	MuParserHandler pHandler;
 
@@ -94,8 +95,6 @@ void parser_run() {
     pHandler.run_expression_tests(1024);
     pHandler.run_expression_tests(2048);
 
-    TimeProfiler::instance().output("muparser_expr");
-
     // test of selected functions
     std::cout << "test_of_functions \n";
     pHandler.run_function_tests(128);
@@ -103,7 +102,7 @@ void parser_run() {
     pHandler.run_function_tests(512);
     pHandler.run_function_tests(1024);
 
-    TimeProfiler::instance().output("muparser_func");
+    TimeProfiler::instance().output("muparser");
 
 }
 

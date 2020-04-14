@@ -46,12 +46,15 @@ class TimeProfiler
 public:
     typedef typename std::chrono::time_point<std::chrono::high_resolution_clock> ChronoTime;
 
-private:
     struct DataTag {
+    	std::string parser;
+    	std::string expression;
+    	int n_blocks;
+    	int block_size;
         ChronoTime start_time;
         double time;
     };
-public:
+
     /// return singleton instance.
 	static TimeProfiler& instance()
     {
@@ -59,78 +62,69 @@ public:
         return tp;
     }
 
+	inline void set_parser(std::string parser)
+	{
+	    this->parser_ = parser;
+	}
+
 	/// Start of time measuring.
-    void start_tag(uint npoints, std::string name)
+    void start_tag(std::string expression, int n_blocks, int block_size)
     {
-        std::map<std::string, uint>::iterator row_it = row_indices_.find(name);
-        if (row_it == row_indices_.end()) { // add new row
-            uint row_idx = row_indices_.size();
-            row_indices_[name] = row_idx;
-            row_it = row_indices_.find(name);
-        }
-
-        std::map<uint, uint>::iterator col_it = col_indices_.find(npoints);
-        if (col_it == col_indices_.end()) { // add new row
-            uint col_idx = col_indices_.size();
-            col_indices_[npoints] = col_idx;
-            col_it = col_indices_.find(npoints);
-        }
-
-        times[col_it->second][row_it->second].start_time = std::chrono::high_resolution_clock::now();
+        times[actual_tpoint_].parser = this->parser_;
+        times[actual_tpoint_].expression = expression;
+        times[actual_tpoint_].n_blocks = n_blocks;
+        times[actual_tpoint_].block_size = block_size;
+        times[actual_tpoint_].start_time = std::chrono::high_resolution_clock::now();
     }
 
 	/// End of time measuring.
-    void end_tag(uint npoints, std::string name)
+    void end_tag(std::string expression, int n_blocks, int block_size)
     {
-        std::map<std::string, uint>::iterator row_it = row_indices_.find(name);
-        std::map<uint, uint>::iterator col_it = col_indices_.find(npoints);
-        ChronoTime start_time = times[col_it->second][row_it->second].start_time;
+        //BP_ASSERT( (times[actual_tpoint_].expression==expression)
+        //        && (times[actual_tpoint_].n_blocks==n_blocks)
+        //        && (times[actual_tpoint_].block_size==block_size) );
+        ChronoTime start_time = times[actual_tpoint_].start_time;
         ChronoTime end_time = std::chrono::high_resolution_clock::now();
-        times[col_it->second][row_it->second].time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+        times[actual_tpoint_].time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+        actual_tpoint_++;
     }
 
     /// Print data to csv file.
     void output(const std::string &file_name) {
-    	std::cout << " ... print to '" + file_name + ".csv' file.\n";
-    	std::string full_file_name = "output/" + file_name + ".csv";
+        std::cout << " ... print to '" + file_name + ".csv' file.\n";
+        std::string full_file_name = "output/" + file_name + ".csv";
         std::ofstream ofs(full_file_name.c_str(), std::ofstream::out);
 
         // header
-        ofs << "\"\"";
-        for (std::map<uint, uint>::iterator col_it = col_indices_.begin(); col_it != col_indices_.end(); ++col_it )
-            ofs << "," << col_it->first;
-        ofs << std::endl;
+        ofs << "\"parser\",\"expr\",\"n_blocks\",\"block_size\",\"time\"" << std::endl;
 
         // data
-        for (std::map<std::string, uint>::iterator row_it = row_indices_.begin(); row_it != row_indices_.end(); ++row_it ) {
-            ofs << "\"" << row_it->first << "\"";
-            for (std::map<uint, uint>::iterator col_it = col_indices_.begin(); col_it != col_indices_.end(); ++col_it )
-                ofs << "," << times[col_it->second][row_it->second].time;
-		    ofs << std::endl;
+        for (uint i=0; i<actual_tpoint_; ++i ) {
+            ofs << "\"" << times[i].parser << "\",\"" << times[i].expression << "\"," << times[i].n_blocks << ",";
+            ofs << times[i].block_size << "," << times[i].time << std::endl;
         }
         ofs.close();
 
-        // clean maps
-        row_indices_.clear();
-        col_indices_.clear();
+        // reset pointer to data array
+        actual_tpoint_ = 0;
     }
 
     TimeProfiler(TimeProfiler const&)    = delete;
     void operator=(TimeProfiler const&)  = delete;
 private:
     /// Forbidden contructor.
-    TimeProfiler() {}
+    TimeProfiler() : actual_tpoint_(0) {}
 
-    DataTag times[10][10];
-    std::map<std::string, uint> row_indices_;
-    std::map<uint, uint> col_indices_;
+    DataTag times[100];    ///< Sets of timer data
+    uint actual_tpoint_;   ///< Hold actual index of previous array
+    std::string parser_;   ///< Hold parser name (it is not necessary to pass in each call)
 };
 
 // Definitions of timer macros
-#define START_TIMER(npoints, tag) \
-    TimeProfiler::instance().start_tag(npoints, tag);
-#define END_TIMER(npoints, tag) \
-    TimeProfiler::instance().end_tag(npoints, tag);
+#define START_TIMER(expr, n_blocks, block_size) \
+    TimeProfiler::instance().start_tag(expr, n_blocks, block_size);
+#define END_TIMER(expr, n_blocks, block_size) \
+    TimeProfiler::instance().end_tag(expr, n_blocks, block_size);
 
 
 #endif /* TIME_PROFILLER_HH_ */
