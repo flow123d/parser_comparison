@@ -97,6 +97,27 @@ public:
         }
     }
 
+    /// Print data to csv file.
+    void output(const std::string &file_name) {
+        std::cout << " ... print to '" + file_name + ".csv' file.\n";
+        std::string full_file_name = "output/" + file_name + ".csv";
+        std::ofstream ofs(full_file_name.c_str(), std::ofstream::out);
+
+        // header
+        ofs << "\"parser\",\"expr\",\"n_blocks\",\"block_size\",\"time\"" << std::endl;
+
+        // data
+        for (uint i=0; i<TimeProfiler::instance().n_data_tags(); ++i ) {
+            auto time = TimeProfiler::instance().data_tag(i);
+            ofs << "\"" << time.parser << "\",\"" << time.expression << "\"," << time.n_blocks << ",";
+            ofs << time.block_size << "," << time.time << std::endl;
+        }
+        ofs.close();
+
+        // reset pointer to data array
+        TimeProfiler::instance().reset_data_tags();
+    }
+
 
     // data members
     int nLoops;

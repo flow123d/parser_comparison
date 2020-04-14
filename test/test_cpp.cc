@@ -137,7 +137,7 @@ void parser_run() {
     pHandler.run_expression_tests(1024);
     pHandler.run_expression_tests(2048);
 
-    TimeProfiler::instance().output("cpp_expr");
+    pHandler.output("cpp_expr");
 }
 
 

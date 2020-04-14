@@ -23,23 +23,21 @@ using namespace std;
  * Output is printed to csv file. Data is arranged to table.
  * Example of usage - appropriate macros are the simplifiest way:
  * @code
-   #define N_LOOPS 1e7
+   #define N_LOOPS 2000
    TestingObject obj;
 
-   START_TIMER(i_column_0, "name_of_row");
+   START_TIMER("abs(x)", N_LOOPS, 128); // expression, number of blocks, block size
    for (uint i=0; i<N_LOOPS; ++i)
        obj.some_complex_function(param0, ...);
-   END_TIMER(i_column_0, "name_of_row");
-   START_TIMER(i_column_0, "name_of_other_row");
+   END_TIMER("abs(x)", N_LOOPS, 128);
+   START_TIMER("sin(x)", N_LOOPS, 128);
    for (uint i=0; i<N_LOOPS; ++i)
        obj.other_function(param0, ...);
-   END_TIMER(i_column_0, "name_of_other_row");
+   END_TIMER("sin(x)", N_LOOPS, 128);
    // loop with different columns and rows
 
-   TimeProfiler::instance().output("out_file");
+   obj.output("out_file");
  * @endcode
- *
- * Arguments of macros are indices to table. Please, fill 'full' table for correct output.
  */
 class TimeProfiler
 {
@@ -89,23 +87,18 @@ public:
         actual_tpoint_++;
     }
 
-    /// Print data to csv file.
-    void output(const std::string &file_name) {
-        std::cout << " ... print to '" + file_name + ".csv' file.\n";
-        std::string full_file_name = "output/" + file_name + ".csv";
-        std::ofstream ofs(full_file_name.c_str(), std::ofstream::out);
+    /// Return data_tag of given idx
+    inline DataTag data_tag(uint idx) const {
+        return times[idx];
+    }
 
-        // header
-        ofs << "\"parser\",\"expr\",\"n_blocks\",\"block_size\",\"time\"" << std::endl;
+    /// Return number of data tags
+    inline unsigned int n_data_tags() const {
+        return actual_tpoint_;
+    }
 
-        // data
-        for (uint i=0; i<actual_tpoint_; ++i ) {
-            ofs << "\"" << times[i].parser << "\",\"" << times[i].expression << "\"," << times[i].n_blocks << ",";
-            ofs << times[i].block_size << "," << times[i].time << std::endl;
-        }
-        ofs.close();
-
-        // reset pointer to data array
+    /// Reset data tags
+    inline void reset_data_tags() {
         actual_tpoint_ = 0;
     }
 

@@ -110,7 +110,7 @@ void parser_run() {
     pHandler.run_function_tests(512);
     pHandler.run_function_tests(1024);
 
-    TimeProfiler::instance().output("exprtk");
+    pHandler.output("exprtk");
 }
 
 
