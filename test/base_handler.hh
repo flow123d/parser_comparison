@@ -63,85 +63,12 @@ public:
 
     virtual double parse_vector_fast(std::string expr, std::string tag_name) =0;
 
-    double cpp_compute_constant() {
-    	double sum = 0.0;
-        START_TIMER(nBulkSize, "constant_cpp");
-        for (int j=0; j<nLoops; ++j) {
-            for (int i=0; i<nBulkSize; ++i) {
-                result_v[i] = 0.5;
-            }
-        }
-        END_TIMER(nBulkSize, "constant_cpp");
-        for (int i=0; i<nBulkSize; ++i) {
-        	sum += result_v[i];
-        }
-
-    	return sum;
-    }
-
-    double cpp_compute_simple() {
-    	double sum = 0.0;
-        START_TIMER(nBulkSize, "simple_cpp");
-        for (int j=0; j<nLoops; ++j) {
-            for (int i=0; i<nBulkSize; ++i) {
-                result_v[i] = x_v[i] + y_v[i] + z_v[i];
-            }
-        }
-        END_TIMER(nBulkSize, "simple_cpp");
-        for (int i=0; i<nBulkSize; ++i) {
-            sum += result_v[i];
-        }
-
-    	return sum;
-    }
-
-    double cpp_compute_complex() {
-    	double sum = 0.0;
-    	double pi = 3.141592653589793238462643;
-        START_TIMER(nBulkSize, "complex_cpp");
-        for (int j=0; j<nLoops; ++j) {
-            for (int i=0; i<nBulkSize; ++i) {
-                result_v[i] = 2*x_v[i] + y_v[i]*3 + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
-            }
-        }
-        END_TIMER(nBulkSize, "complex_cpp");
-        for (int i=0; i<nBulkSize; ++i) {
-            sum += result_v[i];
-        }
-
-    	return sum;
-    }
-
-    double cpp_compute_complex_power() {
-    	double sum = 0.0;
-    	double pi = 3.141592653589793238462643;
-        START_TIMER(nBulkSize, "power_cpp");
-        for (int j=0; j<nLoops; ++j) {
-            for (int i=0; i<nBulkSize; ++i) {
-            	result_v[i] = 2*x_v[i] + pow( y_v[i], 3.0 ) + x_v[i]*(z_v[i]-y_v[i]) + 2*pi*z_v[i];
-            }
-        }
-        END_TIMER(nBulkSize, "power_cpp");
-        for (int i=0; i<nBulkSize; ++i) {
-            sum += result_v[i];
-        }
-
-    	return sum;
-    }
-
-    void run_expression_tests(int vec_size) {
+    virtual void run_expression_tests(int vec_size) {
         init(vec_size);
 
-        this->cpp_compute_constant();
         this->parse_vector_fast(constantLine, "constant_parser");
-
-        this->cpp_compute_simple();
         this->parse_vector_fast(simpleLine, "simple_parser");
-
-        this->cpp_compute_complex();
         this->parse_vector_fast(complexLine, "complex_parser");
-
-        this->cpp_compute_complex_power();
         this->parse_vector_fast(powerLine, "power_parser");
     }
 

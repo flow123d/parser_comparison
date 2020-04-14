@@ -22,7 +22,7 @@ BUILD_LIST       := $(BUILD_SRC:%.cpp=%)
 
 
 .PHONY : all
-all: test_exprtk test_bparser test_muparser plots
+all: test_exprtk test_bparser test_muparser test_cpp plots
 
 
 build:
@@ -105,6 +105,19 @@ test_exprtk: build output build/test_exprtk
 	#rm -f build/test_exprtk 2>/dev/null
 	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
 	build/test_exprtk
+
+	
+#############################################
+#
+
+# make cpp expresions test	
+build/test_cpp: build test/test_cpp.cc
+	$(COMPILER) $(BASE_OPTIONS) -O3 -mavx2  -std=c++11 -I include -I exprtk -o build/test_cpp test/test_cpp.cc
+
+test_cpp: build output build/test_cpp
+	#rm -f build/test_exprtk 2>/dev/null
+	#$(COMPILER) $(BASE_OPTIONS) $(DBG_OPT)  -std=c++11 -I include  -o build/test_exprtk test/test_exprtk.cc
+	build/test_cpp
 
 	
 plots: 
